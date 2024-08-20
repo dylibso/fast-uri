@@ -3,7 +3,7 @@
 const { normalizeIPv6, normalizeIPv4, removeDotSegments, recomposeAuthority, normalizeComponentEncoding } = require('./lib/utils')
 const SCHEMES = require('./lib/schemes')
 
-function normalize (uri, options) {
+function normalize(uri, options) {
   if (typeof uri === 'string') {
     uri = serialize(parse(uri, options), options)
   } else if (typeof uri === 'object') {
@@ -12,13 +12,13 @@ function normalize (uri, options) {
   return uri
 }
 
-function resolve (baseURI, relativeURI, options) {
+function resolve(baseURI, relativeURI, options) {
   const schemelessOptions = Object.assign({ scheme: 'null' }, options)
   const resolved = resolveComponents(parse(baseURI, schemelessOptions), parse(relativeURI, schemelessOptions), schemelessOptions, true)
   return serialize(resolved, { ...schemelessOptions, skipEscape: true })
 }
 
-function resolveComponents (base, relative, options, skipNormalization) {
+function resolveComponents(base, relative, options, skipNormalization) {
   const target = {}
   if (!skipNormalization) {
     base = parse(serialize(base, options), options) // normalize base components
@@ -78,7 +78,7 @@ function resolveComponents (base, relative, options, skipNormalization) {
   return target
 }
 
-function equal (uriA, uriB, options) {
+function equal(uriA, uriB, options) {
   if (typeof uriA === 'string') {
     uriA = unescape(uriA)
     uriA = serialize(normalizeComponentEncoding(parse(uriA, options), true), { ...options, skipEscape: true })
@@ -96,7 +96,7 @@ function equal (uriA, uriB, options) {
   return uriA.toLowerCase() === uriB.toLowerCase()
 }
 
-function serialize (cmpts, opts) {
+function serialize(cmpts, opts) {
   const components = {
     host: cmpts.host,
     scheme: cmpts.scheme,
@@ -158,7 +158,7 @@ function serialize (cmpts, opts) {
     }
 
     if (authority === undefined) {
-      s = s.replace(/^\/\//u, '/%2F') // don't allow the path to start with "//"
+      s = s.replace(/^\/\//, '/%2F') // don't allow the path to start with "//"
     }
 
     uriTokens.push(s)
@@ -174,9 +174,9 @@ function serialize (cmpts, opts) {
   return uriTokens.join('')
 }
 
-const hexLookUp = Array.from({ length: 127 }, (v, k) => /[^!"$&'()*+,\-.;=_`a-z{}~]/u.test(String.fromCharCode(k)))
+const hexLookUp = Array.from({ length: 127 }, (v, k) => /[^!"$&'()*+,\-.;=_`a-z{}~]/.test(String.fromCharCode(k)))
 
-function nonSimpleDomain (value) {
+function nonSimpleDomain(value) {
   let code = 0
   for (let i = 0, len = value.length; i < len; ++i) {
     code = value.charCodeAt(i)
@@ -187,9 +187,9 @@ function nonSimpleDomain (value) {
   return false
 }
 
-const URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u
+const URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/
 
-function parse (uri, opts) {
+function parse(uri, opts) {
   const options = Object.assign({}, opts)
   const parsed = {
     scheme: undefined,
